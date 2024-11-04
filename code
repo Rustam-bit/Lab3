@@ -1,0 +1,126 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+
+using namespace std;
+
+class ShopModel {
+public:
+    double accountBalance;      // Расчётный счёт
+    int basicStore;             // Базовый склад
+    int shopStore;              // Магазинный склад
+    int transitStore;           // Промежуточный склад (машина)
+    double income;              // Доход от продаж
+    double expenses;            // Ежедневные расходы
+    double loan;                // Кредит
+    double loanInterest;        // Процент по кредиту
+    double taxRate;             // Налоговая ставка
+    double dailyTaxAccumulation; // Накопление налога
+
+    ShopModel(double initBalance, int initBasicStore, double initLoan, double initLoanInterest, double initTaxRate)
+            : accountBalance(initBalance), basicStore(initBasicStore), shopStore(0), transitStore(0), income(0), expenses(0),
+              loan(initLoan), loanInterest(initLoanInterest), taxRate(initTaxRate), dailyTaxAccumulation(0) {}
+
+    void transferToTransit(int amount) {
+        if (basicStore >= amount) {
+            basicStore -= amount;
+            transitStore += amount;
+            cout << "Transferred " << amount << " items to transit." << endl;
+        } else {
+            cout << "Not enough items in basic store." << endl;
+        }
+    }
+
+    void transferToShop(int amount) {
+        if (transitStore >= amount) {
+            transitStore -= amount;
+            shopStore += amount;
+            cout << "Transferred " << amount << " items to shop store." << endl;
+        } else {
+            cout << "Not enough items in transit store." << endl;
+        }
+    }
+
+    void sellGoods(double price, int quantity) {
+        if (shopStore >= quantity) {
+            double saleIncome = price * quantity;
+            shopStore -= quantity;
+            income += saleIncome;
+            accountBalance += saleIncome;
+            cout << "Sold " << quantity << " items for " << saleIncome << ". Balance: " << accountBalance << endl;
+        } else {
+            cout << "Not enough items in shop store." << endl;
+        }
+    }
+
+    void applyDailyExpenses(double rent, double wages) {
+        expenses = rent + wages;
+        accountBalance -= expenses;
+        cout << "Daily expenses: " << expenses << ", New Balance: " << accountBalance << endl;
+    }
+
+    void applyTax() {
+        double tax = income * taxRate;
+        accountBalance -= tax;
+        dailyTaxAccumulation = 0;
+        income = 0; // Reset income after tax
+        cout << "Applied tax: " << tax << ", Balance after tax: " << accountBalance << endl;
+    }
+
+    void applyLoanInterest() {
+        double interest = loan * loanInterest;
+        accountBalance -= interest;
+        cout << "Applied loan interest: " << interest << ", New Balance: " << accountBalance << endl;
+    }
+
+    void simulateDay(double price, int quantitySold, double rent, double wages) {
+
+        sellGoods(price, quantitySold);
+        applyDailyExpenses(rent, wages);
+
+        dailyTaxAccumulation += income * taxRate;
+
+        applyLoanInterest();
+    }
+};
+
+int main() {
+    // Инициализация начальных параметров модели
+    ShopModel shop(1000.0, 500, 2000.0, 0.05, 0.2);
+
+    int transferAmount;
+    double sellingPrice;
+    int quantitySold;
+    double rent = 50.0;
+    double wages = 100.0;
+
+    cout << "Enter amount to transfer to transit: ";
+    cin >> transferAmount;
+    shop.transferToTransit(transferAmount);
+
+    cout << "Enter amount to transfer from transit to shop: ";
+    cin >> transferAmount;
+    shop.transferToShop(transferAmount);
+
+    cout << "Enter selling price and quantity to sell: ";
+    cin >> sellingPrice >> quantitySold;
+    shop.simulateDay(sellingPrice, quantitySold, rent, wages);
+
+    return 0;
+}
+
+
+
+
+*/
+Результат
+Enter amount to transfer to transit:200
+ Transferred 200 items to transit.
+Enter amount to transfer from transit to shop:150
+ Transferred 150 items to shop store.
+Enter selling price and quantity to sell:15 
+100
+ Sold 100 items for 1500. Balance: 2500
+Daily expenses: 150, New Balance: 2350
+Applied loan interest: 100, New Balance: 2250
+  /*
